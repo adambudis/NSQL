@@ -1,0 +1,15 @@
+{% extends "template.html" %}
+
+{% block subtitle %}
+About
+{% endblock %}
+
+{% block main %}
+<p>This page have been seen <span id="view_count">{{ view_count }}</span> times</p>
+<h3>Recenze:</h3>
+<ul>
+    {% for user, review in reviews.items() %}
+        <li><span class="username">{{ user }}</span>: <span class="review">{{ review }}</span></li>  
+    {% endfor %}
+</ul>
+{% endblock %}
