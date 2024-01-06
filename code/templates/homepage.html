@@ -1,10 +1,11 @@
 {% extends "template.html" %}
 
 {% block subtitle %}
-About
+Homepage
 {% endblock %}
 
 {% block main %}
+<p>User currently logged in: <span id="username">{{ username }}</span></p>
 <p>This page have been seen <span id="view_count">{{ view_count }}</span> times</p>
 <ul>
 

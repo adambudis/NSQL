@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from redis import Redis
 from pymongo import MongoClient
 from neo4j import GraphDatabase
+import os
 
 app = Flask(__name__, template_folder='templates')
+app.secret_key = os.urandom(24)
 
 # Connection to redis server 
 redis = Redis(host="redis", port=6379)
@@ -19,15 +21,16 @@ users = mymongodb["users"]
 # {% %} python 
 # redirect pro post
 
-
-@app.route("/")
-@app.route("/index")
-def index():
+@app.route("/homepage")
+def homepage():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    
     #kdykoliv někdo zažádá o endpoint index, tak se zvýší v Redis databázi záznam s klíčem homepage_requests o 1
     redis.incr("homepage_requests")
     counter = str(redis.get("homepage_requests"), "utf-8")
     #redis čítač pošleme do šablony index.html, kde ho následně jako Jinja2 proměnnou vypisujeme na obrazovku
-    return render_template("index.html", view_count=counter)
+    return render_template("homepage.html", view_count=counter, username=session["username"])
 
 @app.route("/registration", methods=["GET", "POST"])
 def registration():
@@ -46,6 +49,7 @@ def registration():
  
     return render_template("registration.html")
 
+@app.route("/")
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -55,14 +59,16 @@ def login():
         user = users.find_one({"username": username}) 
 
         if user and password == user["password"]:
-            return redirect(url_for("index"))
+            session["username"] = username
+            return redirect(url_for("homepage"))
 
     # todo: wrong login
     return render_template("/login.html")
 
 @app.route("/logout")
 def logout():
-    pass
+    session.pop("username", None)
+    return redirect(url_for("registration"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
