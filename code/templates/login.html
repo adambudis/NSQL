@@ -1,0 +1,18 @@
+{% extends "template.html" %}
+
+{% block subtitle %}
+Login
+{% endblock %}
+
+{% block main %}
+<h2>Login</h2>
+<form action="/login" method="post">
+    <fieldset>
+        <label for="username">Username: </label>
+        <input type="text" name="username" required>
+        <label for="password">Password:</label>
+        <input type="password" name="password" required>
+    </fieldset>
+    <button type="submit">Login</button>
+</form>
+{% endblock %}
