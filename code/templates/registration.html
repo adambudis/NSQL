@@ -4,17 +4,51 @@
 Registration
 {% endblock %}
 
+{% block nav %}
+<nav class="navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{{ url_for('homepage') }}">TODOs</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="#">text1</a></li>
+            <li><a href="#">text2</a></li>
+            <li><a href="#">text3</a></li>
+          </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a role="button" class="btn btn-primary btn-lg" href="{{ url_for('login') }}">Login</a></li>
+            <li><a role="button" class="btn btn-secondary btn-lg" href="{{ url_for('registration') }}">Sign Up</a></li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
 {% block main %}
-<h2>Registration</h2>
-<form action="/registration" method="post">
-    <fieldset>
-        <label for="username">Username: </label>
-        <input type="text" name="username" required>
-        <label for="email">Email: </label>
-        <input type="email" name="email" required>
-        <label for="password">Password:</label>
-        <input type="password" name="password" required>
-    </fieldset>
-    <button type="submit">Sign in</button>
-</form>
+<div class="container">
+    <h2>Registration</h2>
+    <form action="/registration" method="post">
+        <fieldset>
+            <div class="form-group">
+                <label for="username">Username: </label>
+                <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email: </label>
+                <input type="email" name="email" class="form-control" placeholder="Enter email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+            </div>
+            <div class="form-group">
+                <label for="verify_password">Verify password:</label>
+                <input type="password" name="verify_password" class="form-control" placeholder="Enter password" required>
+            </div>
+        </fieldset>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Sign in</button>
+        </div>
+    </form>
+    <p>Already have account? For login click <a href="{{ url_for('login') }}">here</a></p>
+</div>
 {% endblock %}

@@ -8,16 +8,17 @@
          rel="stylesheet"
          href="{{ url_for('static', filename='css/style.css') }}"
       />
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
    </head>
    <body>
       <header>
-         <h1>Name of my website</h1>
+         <nav>
+            {% block nav %} {% endblock %}
+         </nav>
       </header>
-      <nav>
-         <ul>
-         </ul>
-      </nav>
-      <main>{% block main %} {% endblock %}</main>
+      <main>
+         {% block main %} {% endblock %}
+      </main>
       <footer></footer>
    </body>
 </html>

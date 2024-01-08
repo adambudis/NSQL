@@ -10,9 +10,11 @@ app.secret_key = os.urandom(24)
 # Connection to redis server 
 redis = Redis(host="redis", port=6379)
 
+# Connection to mongodb and create database and collection
 mongo = MongoClient("mongodb://nsql-mongodb-1/", username="admin", password="admin")
 mymongodb = mongo["mymongodb"]
 users = mymongodb["users"]
+todo_lists = mymongodb["todo_lists"] 
 
 # not working 
 # driver = GraphDatabase.driver("bolt://nsql-neo4j-1:7687")
@@ -26,13 +28,11 @@ def homepage():
     if "username" not in session:
         return redirect(url_for("login"))
     
-    #kdykoliv někdo zažádá o endpoint index, tak se zvýší v Redis databázi záznam s klíčem homepage_requests o 1
-    redis.incr("homepage_requests")
-    counter = str(redis.get("homepage_requests"), "utf-8")
-    #redis čítač pošleme do šablony index.html, kde ho následně jako Jinja2 proměnnou vypisujeme na obrazovku
-    return render_template("homepage.html", view_count=counter, username=session["username"])
+    todo_list = todo_lists.find({"username": session["username"]})
 
-@app.route("/registration", methods=["GET", "POST"])
+    return render_template("homepage.html", username=session["username"], todo_list=todo_list)
+
+@app.route("/registration", methods=["POST", "GET"])
 def registration():
     if request.method == "POST":
         username = request.form.get("username")
@@ -46,11 +46,14 @@ def registration():
         # todo: přidat hash hesla
         users.insert_one({'username': username, 'email': email, 'password': password})
         return redirect(url_for("login"))
+    
+    if "username" in session:
+        return redirect(url_for("homepage"))
  
     return render_template("registration.html")
 
 @app.route("/")
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
         username = request.form.get("username")
@@ -63,12 +66,42 @@ def login():
             return redirect(url_for("homepage"))
 
     # todo: wrong login
+    if "username" in session:
+        return redirect(url_for("homepage"))
+
     return render_template("/login.html")
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST", "GET"])
 def logout():
-    session.pop("username", None)
-    return redirect(url_for("registration"))
+    if "username" in session:
+        session.pop("username", None)
+
+    return redirect(url_for("login"))
+
+@app.route("/create_task", methods=["POST"])
+def create_task():
+    if "username" in session and request.method == "POST":
+        heading = request.form.get("heading")
+        deadline = request.form.get("deadline")
+        priority = request.form.get("priority")
+        description = request.form.get("description")
+
+        # todo id task
+        todo_lists.insert_one({
+            "username": session["username"],
+            "heading": heading, 
+            "deadline": deadline,
+            "priority": priority,
+            "description": description,
+            "is_done": False  
+        })
+
+    return redirect(url_for('homepage'))
+
+@app.route("/tasks")
+def tasks():
+    todo_list = todo_lists.find({"username": session["username"]})
+    return render_template("/tasks.html", todo_list=todo_list)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

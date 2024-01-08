@@ -1,0 +1,46 @@
+{% extends "template.html" %}
+
+{% block subtitle %}
+Login
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{{ url_for('homepage') }}">TODOs</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('homepage') }}">Home</a></li>
+            <li><a href="{{ url_for('tasks') }}">Tasks</a></li>
+            <li><a href="#">?? Add task</a></li>
+            <li><a href="#">Friends</a></li>
+          </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a role="button" class="btn btn-primary btn-lg" href="{{ url_for('login') }}">Login</a></li>
+            <li><a role="button" class="btn btn-secondary btn-lg" href="{{ url_for('registration') }}">Sign Up</a></li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <h2>Tasks in to do:</h2>
+    <ul>
+        {% for task in todo_list %}
+            <div class="card">
+                <div class="card-header">
+                    {{ task.heading }}
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ task.description }}</p>
+                </div>
+                <div class="card-footer">
+                    {{ task.deadline }}
+                </div>
+            </div>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
