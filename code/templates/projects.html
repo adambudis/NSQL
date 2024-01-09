@@ -1,0 +1,83 @@
+{% extends "template.html" %}
+
+{% block subtitle %}
+Projects
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('homepage') }}">TODOs</a>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('homepage') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('projects') }}">Projects</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('tasks') }}">Tasks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Friends</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+                <a role="button" class="nav-link btn btn-outline-dark btn-lg" href="{{ url_for('profile') }}">{{ username }}</a>
+            </li>
+            <li class="nav-item">
+                <a role="button" class="nav-link btn btn-primary btn-lg" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block main %}
+<div class="container mt-2">
+    <h2>Projects</h2>
+    <form action="/projects" method="POST">
+        <fieldset>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title: </label>
+                <input type="text" name="title" class="form-control" placeholder="Enter title">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description: </label>
+                <textarea name="description" class="form-control" placeholder="Enter description" rows="4"></textarea>
+            </div>
+        </fieldset>
+        <button type="submit" class="btn btn-primary">Create project</button>
+    </form>
+
+    {% for project in my_projects%}
+        <div class="card mt-5">
+            <div class="card-header">
+                <h5 class="card-title">{{ project.title }}</h5>
+                <span>{{ project.time_created }}</span>
+            </div>
+            <div class="card-body">
+                <p class="card-text shorten_text">{{ project.description }}</p>
+                <p class="card-text">Owner: {{ project.owner }}</p>
+                <p class="card-text">Users: {{ project.users }}</p>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col">
+                        <a role="button" href="#" class="btn btn-secondary">Add users</a>
+                        <a role="button" href="#" class="btn btn-secondary">Show tasks</a>
+                    </div>
+                    <div class="col text-end">
+                        {% if project.owner == username %}
+                            <a role="button" href="{{ url_for('delete_project', _id=project._id) }}" class="btn btn-danger">Delete</a>
+                        {% else %}
+                            <a role="button" href="#" class="btn btn-danger">Leave</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 {% extends "template.html" %}
 
 {% block subtitle %}
-Homepage
+Task details
 {% endblock %}
 
 {% block nav %}
@@ -13,10 +13,10 @@ Homepage
                 <a class="nav-link" href="{{ url_for('homepage') }}">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('projects') }}">Projects</a>
+                <a class="nav-link" href="{{ url_for('tasks') }}">Tasks</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('tasks') }}">Tasks</a>
+                <a class="nav-link" href="#">?? Add task</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Friends</a>
@@ -36,20 +36,20 @@ Homepage
 
 {% block main %}
 <div class="container mt-2">
-    <h2>Create new task</h2>
+    <h2>Task details</h2>
     <form action="/create_task" method="POST">
         <fieldset>
             <div class="mb-3">
                 <label for="heading" class="form-label">Heading: </label>
-                <input type="text" name="heading" class="form-control" placeholder="Enter heading">
+                <input type="text" name="heading" class="form-control" value="{{ task.heading }}">
             </div>
             <div class="mb-3">
                 <label for="deadline" class="form-label">Deadline: </label>
-                <input type="date" name="deadline" class="form-control" placeholder="Enter deadline">
+                <input type="date" name="deadline" class="form-control" value="{{ task.deadline }}">
             </div>
             <div class="mb-3">
                 <label for="priority" class="form-label">Priority: </label>
-                <select name="priority" class="form-control">
+                <select name="priority" class="form-control" value="">
                     <option value="high">High</option>
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
@@ -57,10 +57,10 @@ Homepage
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description: </label>
-                <textarea name="description" class="form-control" placeholder="Enter description" rows="4"></textarea>
+                <textarea name="description" class="form-control" rows="8">{{ task.description }}</textarea>
             </div>
         </fieldset>
-        <button type="submit" class="btn btn-primary">Create task</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
     </form>
 </div>
 {% endblock %}
