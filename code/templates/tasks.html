@@ -57,13 +57,16 @@ Tasks
                                 <p class="card-text">Created: <span class="fw-bold">{{ task.time_created }}</span></p>
                             </div>
                         </div>
-                        <div class="form-check mb-3">
-                            <label class="form-check-label" for="isDone">Mark as finished</label>
-                            <input class="form-check-input" type="checkbox" value="{{ task.is_done }}">
-                        </div>
                     </div>
                     <div class="card-footer">
-                        <a role="button" href="{{ url_for('task_details', _id=task._id) }}" class="btn btn-primary">Edit Task</a>
+                        <div class="row">
+                            <div class="col">
+                                <a role="button" href="{{ url_for('task_details', _id=task._id) }}" class="btn btn-primary">Edit Task</a>
+                            </div>
+                            <div class="col text-end">
+                                <button class="btn btn-success">Mark as finished</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

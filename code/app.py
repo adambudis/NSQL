@@ -19,7 +19,6 @@ users_collection = mymongodb["users"]
 todo_lists_collection = mymongodb["todo_lists"]
 projects_collection = mymongodb["projects"]
 
-# not working 
 # driver = GraphDatabase.driver("bolt://nsql-neo4j-1:7687")
 
 # {{}} promenna
@@ -92,7 +91,7 @@ def projects():
             "time_created": datetime.now().strftime("%Y-%m-%d"),
             "description": description,
             "owner": session["username"],
-            "users": ""
+            "users": []
         })
 
     find_projects = projects_collection.find({ 
@@ -105,19 +104,25 @@ def projects():
 
 @app.route("/delete_project/<_id>")
 def delete_project(_id):
-
+    if "username" not in session:
+        return redirect(url_for("login"))
+    
+    # safe?
     find_project = projects_collection.delete_one({"_id": ObjectId(_id)})
+
+    if not find_project or find_project["owner"] != session["username"]:
+        return redirect(url_for("login"))
+
     return redirect(url_for("projects"))
 
 @app.route("/create_task", methods=["POST"])
 def create_task():
-    if "username" in session and request.method == "POST":
+    if request.method == "POST":
         heading = request.form.get("heading")
         deadline = request.form.get("deadline")
         priority = request.form.get("priority")
         description = request.form.get("description")
 
-        # todo id task
         todo_lists_collection.insert_one({
             "username": session["username"],
             "heading": heading, 
@@ -132,8 +137,15 @@ def create_task():
 
 @app.route("/task_details/<_id>", methods=["POST", "GET"])
 def task_details(_id):
-    task = todo_lists_collection.find_one({'_id': ObjectId(_id)})
+    if "username" not in session:
+        return redirect(url_for("login"))
 
+    task = todo_lists_collection.find_one({'_id': ObjectId(_id)})
+    
+    # safe?
+    if not task or task["username"] != session["username"]:
+        return redirect(url_for("login"))
+        
     return render_template("/task_details.html", username=session["username"], task=task)
 
 @app.route("/tasks")
