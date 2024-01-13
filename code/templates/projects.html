@@ -58,15 +58,17 @@ Projects
                 <span>Created: {{ project.time_created }}</span>
             </div>
             <div class="card-body">
-                <p class="card-text shorten_text">{{ project.description }}</p>
+                <p class="card-text">{{ project.description }}</p>
                 <p class="card-text">Owner: {{ project.owner }}</p>
                 <p class="card-text">Users: {{ project.users }}</p>
             </div>
             <div class="card-footer">
                 <div class="row">
                     <div class="col">
-                        <a role="button" href="#" class="btn btn-secondary">Add users</a>
                         <a role="button" href="#" class="btn btn-secondary">Show tasks</a>
+                        {% if project.owner == username %}
+                        <a role="button" href="{{ url_for('project_details', _id=project._id) }}" class="btn btn-secondary">Show details</a>
+                        {% endif %}
                     </div>
                     <div class="col text-end">
                         {% if project.owner == username %}
