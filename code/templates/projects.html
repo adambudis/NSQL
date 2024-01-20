@@ -5,37 +5,11 @@ Projects
 {% endblock %}
 
 {% block nav %}
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('homepage') }}">TODOs</a>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('homepage') }}">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('projects') }}">Projects</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('tasks') }}">Tasks</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Friends</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-                <a role="button" class="nav-link btn btn-outline-dark btn-lg" href="{{ url_for('profile') }}">{{ username }}</a>
-            </li>
-            <li class="nav-item">
-                <a role="button" class="nav-link btn btn-primary btn-lg" href="{{ url_for('logout') }}">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+{% include "user_nav.html" %}
 {% endblock %}
 
 {% block main %}
-<div class="container mt-2">
+<div class="container mt-3">
     <h2>Projects</h2>
     <form action="/projects" method="POST">
         <fieldset>
@@ -65,7 +39,7 @@ Projects
             <div class="card-footer">
                 <div class="row">
                     <div class="col">
-                        <a role="button" href="#" class="btn btn-secondary">Show tasks</a>
+                        <a role="button" href="{{ url_for('project_tasks', _id=project._id) }}" class="btn btn-secondary">Show tasks</a>
                         {% if project.owner == username %}
                         <a role="button" href="{{ url_for('project_details', _id=project._id) }}" class="btn btn-secondary">Show details</a>
                         {% endif %}
@@ -74,7 +48,7 @@ Projects
                         {% if project.owner == username %}
                             <a role="button" href="{{ url_for('delete_project', _id=project._id) }}" class="btn btn-danger">Delete</a>
                         {% else %}
-                            <a role="button" href="#" class="btn btn-danger">Leave</a>
+                            <a role="button" href="{{ url_for('leave_project', _id=project._id) }}" class="btn btn-danger">Leave</a>
                         {% endif %}
                     </div>
                 </div>

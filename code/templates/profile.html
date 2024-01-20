@@ -5,43 +5,24 @@ Projects
 {% endblock %}
 
 {% block nav %}
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('homepage') }}">TODOs</a>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('homepage') }}">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('projects') }}">Projects</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('tasks') }}">Tasks</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Friends</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-                <a role="button" class="nav-link btn btn-outline-dark btn-lg" href="{{ url_for('profile') }}">{{ username }}</a>
-            </li>
-            <li class="nav-item">
-                <a role="button" class="nav-link btn btn-primary btn-lg" href="{{ url_for('logout') }}">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+{% include "user_nav.html" %}
 {% endblock %}
 
 {% block main %}
-<div class="container mt-2">
+<div class="container mt-3">
     <h2>Profile</h2>
+    <h4>Invitations</h4>
     {% for invitation in invitations %}
-        <div class="card mt-3">
-            <div class="card-body">User named {{ invitation.sender_user }} invited you to project called {{ invitation.id_project }}</div>
-            <a role="button" class="btn btn-success btn" href="{{ url_for('accept_invitation', _id=invitation._id) }}">Accept</a>
-            <a role="button" class="btn btn-danger btn" href="{{ url_for('decline_invitation', _id=invitation._id) }}">Decline</a>
+        <div class="card mt-1">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">User <strong>{{ invitation.sender_user }}</strong> invited you to project called <strong>{{ invitation.title }}</strong></div>
+                    <div class="col-3 text-end">
+                        <a role="button" class="btn btn-success btn-sm" href="{{ url_for('accept_invitation', _id=invitation._id) }}">Accept</a>
+                        <a role="button" class="btn btn-danger btn-sm" href="{{ url_for('decline_invitation', _id=invitation._id) }}">Decline</a>
+                    </div>
+                </div>
+            </div>
         </div>
     {% endfor %}
 </div>

@@ -5,72 +5,14 @@ Tasks
 {% endblock %}
 
 {% block nav %}
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('homepage') }}">TODOs</a>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('homepage') }}">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('projects') }}">Projects</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('tasks') }}">Tasks</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Friends</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-                <a role="button" class="nav-link btn btn-outline-dark btn-lg" href="{{ url_for('profile') }}">{{ username }}</a>
-            </li>
-            <li class="nav-item">
-                <a role="button" class="nav-link btn btn-primary btn-lg" href="{{ url_for('logout') }}">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+{% include "user_nav.html" %}
 {% endblock %}
 
 {% block main %}
-<div class="container mt-2">
-    <h2>Tasks in to do:</h2>
-    <div class="row row-cols-2">
-        {% for task in todo_list %}
-            <div class="col">
-                <div class="card mt-5">
-                    <div class="card-header">
-                        <h5 class="card-title">{{ task.heading }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text shorten_text">{{ task.description }}</p>
-                        <div class="row">
-                            <div class="col-4">
-                                <p class="card-text">Deadline: <span class="fw-bold">{{ task.deadline }}</span></p>
-                            </div>
-                            <div class="col-4">
-                                <p class="card-text">Priority: <span class="fw-bold">{{ task.priority }}</span></p>
-                            </div>
-                            <div class="col-4">
-                                <p class="card-text">Created: <span class="fw-bold">{{ task.time_created }}</span></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col">
-                                <a role="button" href="{{ url_for('task_details', _id=task._id) }}" class="btn btn-primary">Edit Task</a>
-                            </div>
-                            <div class="col text-end">
-                                <button class="btn btn-success">Mark as finished</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+<div class="container mt-3">
+    <h2>Tasks in project</h2>
+    
+        
     </div>
 </div>
 {% endblock %}

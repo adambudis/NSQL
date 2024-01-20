@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from functools import wraps
 from redis import Redis
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -16,14 +17,11 @@ redis = Redis(host="redis", port=6379)
 mongo = MongoClient("mongodb://nsql-mongodb-1/", username="admin", password="admin")
 mymongodb = mongo["mymongodb"]
 users_collection = mymongodb["users"]
-todo_lists_collection = mymongodb["todo_lists"]
+tasks_collection = mymongodb["todo_lists"]
 projects_collection = mymongodb["projects"]
 invitations_collection = mymongodb["invitations"]
 # friend requests
 # friedns 
-
-# TODO: REAL-TIME INVITATIONS TO PROJECT IN REDIS 
-# TODO: POŘEŠIT NAV
 
 # driver = GraphDatabase.driver("bolt://nsql-neo4j-1:7687")
 
@@ -31,14 +29,31 @@ invitations_collection = mymongodb["invitations"]
 # {% %} python 
 # redirect pro post
 
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "username" not in session:
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
 @app.route("/homepage")
 def homepage():
     if "username" not in session:
         return redirect(url_for("login"))
     
-    todo_list = todo_lists_collection.find({"username": session["username"]})
+    find_tasks = tasks_collection.find({"username": session["username"]})
 
-    return render_template("homepage.html", username=session["username"], todo_list=todo_list)
+    return render_template("homepage.html", username=session["username"], tasks=find_tasks)
+
+####################################################################################
+
+#####   LOGIN / REGISTRATION / LOGOUT   
+
+####################################################################################
 
 @app.route("/registration", methods=["POST", "GET"])
 def registration():
@@ -86,7 +101,15 @@ def logout():
 
     return redirect(url_for("login"))
 
+
+####################################################################################
+
+######   PROJECTS   
+
+####################################################################################
+
 @app.route("/projects", methods=["POST", "GET"])
+@login_required
 def projects():
     if request.method == "POST":
         title = request.form.get("title")
@@ -106,32 +129,35 @@ def projects():
             {"users": session["username"]}
         ]
     }) 
+
     return render_template("/projects.html", username=session["username"], my_projects=find_projects)
 
 @app.route("/delete_project/<_id>")
+@login_required
 def delete_project(_id):
-    if "username" not in session:
-        return redirect(url_for("login"))
     
-    # safe?
-    find_project = projects_collection.delete_one({"_id": ObjectId(_id)})
+    if session["username"] == projects_collection.find_one({"_id": ObjectId(_id)})['owner']:
+        projects_collection.delete_one({"_id": ObjectId(_id)})
 
-    # TODO: fix
-    #if not find_project or find_project["owner"] != session["username"]:
-    #    return redirect(url_for("login"))
+    # TODO: možné poslání upozornění na smazání?
 
     return redirect(url_for("projects"))
 
+@app.route("/leave_project/<_id>")
+@login_required
+def leave_project(_id):
+
+    projects_collection.update_one({"_id": ObjectId(_id)}, {"$pull": {"users": session["username"]}})
+    
+    return redirect(url_for("projects"))
+
 @app.route("/project_details/<_id>", methods=["POST", "GET"])
+@login_required
 def project_details(_id):
-    if "username" not in session:
-        return redirect(url_for("login"))
 
     project = projects_collection.find_one({'_id': ObjectId(_id)})
-    
-    # safe?
-    if not project or project["owner"] != session["username"]:
-        return redirect(url_for("login")) 
+    if project["owner"] != session["username"]:
+        return redirect(url_for("homepage")) 
     
     if request.method == "POST":
         new_title = request.form.get("title")
@@ -143,12 +169,16 @@ def project_details(_id):
     return render_template("/project_details.html", username=session["username"], project=project)
 
 @app.route("/add_user/<_id>", methods=["POST"])
+@login_required
 def add_user(_id):
-    if "username" not in session:
-        return redirect(url_for("login"))
-    
+    # TODO: invitation exists? user already in project?
+
     if request.method == "POST":
-        invited_user = users_collection.find_one({"username": request.form.get("username")})
+        invited_user = users_collection.find_one({"username": request.form.get("add_user")})
+
+        if not invited_user:
+            return redirect(url_for("project_details", _id=_id))
+
         if invited_user:
             invitations_collection.insert_one({
                 "invited_user": invited_user["username"],
@@ -160,7 +190,25 @@ def add_user(_id):
 
     return redirect(url_for("homepage")) 
 
+@app.route("/remove_user/<_id>", methods=["POST"])
+@login_required
+def remove_user(_id):
+
+    if request.method == "POST":
+        user = users_collection.find_one({"username": request.form.get("remove_user")})
+        if user:
+            projects_collection.update_one({"_id": ObjectId(_id)}, {"$pull": {"users": user["username"]}})
+            return redirect(url_for("project_details", _id=_id))
+    return redirect(url_for("homepage"))
+
+####################################################################################
+
+######   TASKS
+
+####################################################################################
+
 @app.route("/create_task", methods=["POST"])
+@login_required
 def create_task():
     if request.method == "POST":
         heading = request.form.get("heading")
@@ -168,8 +216,9 @@ def create_task():
         priority = request.form.get("priority")
         description = request.form.get("description")
 
-        todo_lists_collection.insert_one({
+        tasks_collection.insert_one({
             "username": session["username"],
+            "id_project": "",
             "heading": heading, 
             "deadline": deadline,
             "time_created": datetime.now().strftime("%Y-%m-%d"),
@@ -179,35 +228,121 @@ def create_task():
         })
 
     return redirect(url_for('homepage'))
-#             ???
-@app.route("/task_details/<_id>", methods=["POST", "GET"])
-def task_details(_id):
-    if "username" not in session:
-        return redirect(url_for("login"))
 
-    task = todo_lists_collection.find_one({'_id': ObjectId(_id)})
+@app.route("/project_tasks/<_id>", methods=["POST", "GET"])
+@login_required
+def project_tasks(_id):
+    if request.method == "POST":
+        heading = request.form.get("heading")
+        deadline = request.form.get("deadline")
+        priority = request.form.get("priority")
+        description = request.form.get("description")
+
+        tasks_collection.insert_one({
+            "username": session["username"],
+            "id_project": ObjectId(_id),
+            "heading": heading, 
+            "deadline": deadline,
+            "time_created": datetime.now().strftime('%d %B, %Y'),
+            "priority": priority,
+            "description": description,
+            "is_done": False  
+        })
+
+    find_project = projects_collection.find_one({"_id": ObjectId(_id)})
+    if session["username"] != find_project["owner"] and session["username"] not in find_project["users"]:
+        return redirect(url_for("homepage"))
     
-    # safe?
-    if not task or task["username"] != session["username"]:
-        return redirect(url_for("login"))
+    find_tasks = tasks_collection.find({"id_project": ObjectId(_id)})
+     
+    return render_template("/project_tasks.html", username=session["username"], tasks=find_tasks, project=find_project)
+
+@app.route("/task_details/<_id>", methods=["POST", "GET"])
+@login_required
+def task_details(_id):
+    task = tasks_collection.find_one({'_id': ObjectId(_id)})
+    project = projects_collection.find_one({"_id": ObjectId(task["id_project"])})
+    
+    if session["username"] != project["owner"] and session["username"] not in project["users"]:
+        return redirect(url_for("homepage"))
+
+    if request.method == "POST":
+        new_heading = request.form.get("heading")
+        new_description = request.form.get("description")
+        new_deadline = request.form.get("deadline")
+        new_priority = request.form.get("priority")
+
+        tasks_collection.update_one({"_id": ObjectId(_id)}, {"$set": {
+            "heading": new_heading, 
+            "description": new_description,
+            "deadline": new_deadline,
+            "priority": new_priority
+        }})
+
+        return redirect(url_for("homepage"))
         
     return render_template("/task_details.html", username=session["username"], task=task)
 
+# TODO: dekorator 
+@app.route("/delete_task/<_id>")
+@login_required
+def delete_task(_id):
+    task = tasks_collection.find_one({"_id": ObjectId(_id)})
+    project = projects_collection.find_one({"_id": task["id_project"]})
+    if session["username"] != project["owner"] and session["username"] not in project["users"]:
+        return redirect(url_for("homepage"))
+    tasks_collection.delete_one(task)
+    return redirect(url_for("project_tasks", _id=project["_id"]))
+
+@app.route("/complete_task/<_id>")
+@login_required
+def complete_task(_id):
+    task = tasks_collection.find_one({"_id": ObjectId(_id)})
+    project = projects_collection.find_one({"_id": task["id_project"]})
+    if session["username"] != project["owner"] and session["username"] not in project["users"]:
+        return redirect(url_for("homepage"))
+    tasks_collection.update_one(task, {"$set": {"is_done": True}})
+    return redirect(url_for("project_tasks", _id=project["_id"]))
+
+@app.route("/uncomplete_task/<_id>")
+@login_required
+def uncomplete_task(_id):
+    task = tasks_collection.find_one({"_id": ObjectId(_id)})
+    project = projects_collection.find_one({"_id": task["id_project"]})
+    if session["username"] != project["owner"] and session["username"] not in project["users"]:
+        return redirect(url_for("homepage"))
+    tasks_collection.update_one(task, {"$set": {"is_done": False}})
+    return redirect(url_for("project_tasks", _id=project["_id"]))
+
 @app.route("/tasks")
+@login_required
 def tasks():
-    todo_list = todo_lists_collection.find({"username": session["username"]})
-    return render_template("/tasks.html", username=session["username"], todo_list=todo_list)
+    find_tasks = tasks_collection.find({"username": session["username"]})
+    return render_template("/tasks.html", username=session["username"], tasks=find_tasks)
+
+
+####################################################################################
+
+#####   PROFILE
+
+####################################################################################
 
 @app.route("/profile")
+@login_required
 def profile():
-    if "username" not in session:
-        return redirect(url_for("login")) 
     
     get_invitations = invitations_collection.find({"invited_user": session["username"]})
+    processed_invitations = []
+    for invitation in get_invitations:
+        project = projects_collection.find_one({"_id": ObjectId(invitation["id_project"])})
+        if project:
+            invitation["title"] = project["title"]
+            processed_invitations.append(invitation)
     
-    return render_template("/profile.html", username=session["username"], invitations=get_invitations)
+    return render_template("/profile.html", username=session["username"], invitations=processed_invitations)
 
 @app.route("/accept_invitation/<_id>")
+@login_required
 def accept_invitation(_id):
 
     # safe?
@@ -218,6 +353,7 @@ def accept_invitation(_id):
     return redirect(url_for("profile")) 
 
 @app.route("/decline_invitation/<_id>")
+@login_required
 def decline_invitation(_id):
 
     # safe?
