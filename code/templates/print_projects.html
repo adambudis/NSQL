@@ -1,0 +1,30 @@
+{% for project in projects %}
+    <div class="card mt-5">
+        <div class="card-header">
+            <h5 class="card-title">{{ project.title }}</h5>
+            <span>Created: {{ project.time_created }}</span>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ project.description }}</p>
+            <p class="card-text">Owner: {{ project.owner }}</p>
+            <p class="card-text">Users: {{ project.users }}</p>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col">
+                    <a role="button" href="{{ url_for('project_tasks', _id=project._id) }}" class="btn btn-secondary">Show tasks</a>
+                    {% if project.owner == username %}
+                        <a role="button" href="{{ url_for('project_details', _id=project._id) }}" class="btn btn-secondary">Show details</a>
+                    {% endif %}
+                </div>
+                <div class="col text-end">
+                    {% if project.owner == username %}
+                        <a role="button" href="{{ url_for('delete_project', _id=project._id) }}" class="btn btn-danger">Delete</a>
+                    {% else %}
+                        <a role="button" href="{{ url_for('leave_project', _id=project._id) }}" class="btn btn-danger">Leave</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}

@@ -10,25 +10,8 @@ Homepage
 
 {% block main %}
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <nav class="bg-dark navbar-dark">
-                <div class="">
-                    <ul class="navbar-nav text-center">
-                        <li class="nav-item">
-                            <a class="nav-link" href="">Project1</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Project2</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-        <div class="col-10">
-            <h2>Homepage</h2>
-        </div>
-    </div>
+<div class="container mt-3">
+    <h2>My projects</h2>
+    {% include "print_projects.html" %}
 </div>
 {% endblock %}

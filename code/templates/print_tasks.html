@@ -1,0 +1,43 @@
+<div class="row row-cols-2">
+    {% for task in tasks %}
+        <div class="col">
+            <div class="card mt-4">
+                {% if task.is_done %}
+                    <div class="card-header bg-success bg-gradient">
+                {% else %}
+                    <div class="card-header">
+                {% endif %}
+                    <h5 class="card-title">{{ task.heading }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text shorten_text">{{ task.description }}</p>
+                    <div class="row">
+                        <div class="col-4">
+                            <p class="card-text">Deadline: <span class="fw-bold">{{ task.deadline }}</span></p>
+                        </div>
+                        <div class="col-4">
+                            <p class="card-text">Priority: <span class="fw-bold">{{ task.priority }}</span></p>
+                        </div>
+                        <div class="col-4">
+                            <p class="card-text">Created: <span class="fw-bold">{{ task.time_created }}</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col">
+                            <a role="button" href="{{ url_for('task_details', _id=task._id) }}" class="btn btn-primary">Edit Task</a>
+                        </div>
+                        <div class="col text-end">
+                            {% if task.is_done %}
+                                <button class="btn btn-success" disabled>Already finished</button>
+                            {% else %}
+                                <a role="button" href="{{ url_for('complete_task', _id=task._id )}}" class="btn btn-success">Mark as finished</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

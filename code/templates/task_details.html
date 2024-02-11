@@ -18,7 +18,9 @@ Task details
             <div>Completed: <span class="fw-bold">{% if task.is_done %} yes {% else %} no {% endif %}</span></div>
         </div>
         <div class="col text-end">
-            <a role="button" href="{{ url_for('uncomplete_task', _id=task._id )}}" class="btn btn-success">Unmark as completed</a>
+            {% if task.is_done %}
+                <a role="button" href="{{ url_for('uncomplete_task', _id=task._id )}}" class="btn btn-success">Unmark as completed</a>
+            {% endif %}
         </div>
     </div>
     <form class="mt-3" action="{{ url_for('task_details', _id=task._id) }}" method="POST">
