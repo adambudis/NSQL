@@ -7,7 +7,7 @@
 ### Systémové požadavky
 
 - Operační systém: Linux/macOS/Windows s WSL
-- Nainstalovaný **Docker** a **Docker Compose**
+- Nainstalovaný **Docker**
 - Připojení k internetu pro stažení závislostí
 
 ### Předběžná konfigurace
@@ -26,7 +26,7 @@ Vytvořte soubor **.env** podle příkladu **.env.example** a upravte hodnoty:
 cp .env.example .env
 ```
 
-Upravte soubor **.env** a nastavte správné hodnoty:
+Upravte soubor **.env** a nastavte hodnoty:
 
 ```
 MONGO_USER=<your_username>
