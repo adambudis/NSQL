@@ -18,13 +18,10 @@ load_dotenv()
 # Získání hodnot z prostředí
 MONGO_HOST = os.getenv("MONGO_HOST", "nsql-mongodb-1")
 MONGO_USER = os.getenv("MONGO_USER", "admin")
-MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "admin")
+MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "password")
 
 # Připojení k MongoDB s použitím proměnných prostředí
-mongo = MongoClient(
-    f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_HOST}:27017/",
-    authSource="admin"
-)
+mongo = MongoClient("mongodb://nsql-mongodb-1/", username=MONGO_USER, password=MONGO_PASSWORD)
 mymongodb = mongo["mymongodb"]
 users_collection = mymongodb["users"]
 tasks_collection = mymongodb["tasks"]

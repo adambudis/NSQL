@@ -1,37 +1,46 @@
-{% extends "template.html" %}
-
-{% block subtitle %}
-Registration
-{% endblock %}
-
-{% block nav %}
-{% include "non-user_nav.html" %}
-{% endblock %}
-
-{% block main %}
+{% extends "template.html" %} {% block subtitle %} Registration {% endblock %}
+{% block nav %} {% include "non-user_nav.html" %} {% endblock %} {% block main
+%}
 <div class="container mt-3">
-    <h2>Registration</h2>
-    <form action="/registration" method="post">
-        <fieldset>
-            <div class="mb-3">
-                <label for="username" class="form-label">Username: </label>
-                <input type="text" name="username" class="form-control" placeholder="Enter username" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email: </label>
-                <input type="email" name="email" class="form-control" placeholder="Enter email" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password:</label>
-                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
-            </div>
-            <div class="mb-3">
-                <label for="verify_password" class="form-label">Verify password:</label>
-                <input type="password" name="verify_password" class="form-control" placeholder="Enter password" required>
-            </div>
-        </fieldset>
-        <button type="submit" class="btn btn-primary">Sign in</button>
-    </form>
-    <p>Already have account? For login click <a href="{{ url_for('login') }}">here</a></p>
+  <h2>Registration</h2>
+  <form action="/registration" method="post">
+    <fieldset>
+      <div class="mb-3">
+        <label for="username" class="form-label">Username: </label>
+        <input
+          type="text"
+          name="username"
+          class="form-control"
+          placeholder="Enter username"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email: </label>
+        <input
+          type="email"
+          name="email"
+          class="form-control"
+          placeholder="Enter email"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          placeholder="Enter password"
+          required
+        />
+      </div>
+    </fieldset>
+    <button type="submit" class="btn btn-primary">Sign in</button>
+  </form>
+  <p>
+    Already have account? For login click
+    <a href="{{ url_for('login') }}">here</a>
+  </p>
 </div>
 {% endblock %}
