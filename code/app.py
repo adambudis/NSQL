@@ -21,7 +21,7 @@ MONGO_USER = os.getenv("MONGO_USER", "admin")
 MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "password")
 
 # Připojení k MongoDB s použitím proměnných prostředí
-mongo = MongoClient("mongodb://nsql-mongodb-1/", username=MONGO_USER, password=MONGO_PASSWORD)
+mongo = MongoClient("mongodb://mongodb:27017/", username=MONGO_USER, password=MONGO_PASSWORD)
 mymongodb = mongo["mymongodb"]
 users_collection = mymongodb["users"]
 tasks_collection = mymongodb["tasks"]
