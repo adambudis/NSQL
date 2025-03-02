@@ -7,15 +7,24 @@ from neo4j import GraphDatabase
 import os
 from datetime import datetime
 import bcrypt
+from dotenv import load_dotenv
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = os.urandom(24)
 
-# redis server 
-# redis = Redis(host="redis", port=6379)
+# Načtení proměnných prostředí
+load_dotenv()
 
-# mongodb, create database and collections
-mongo = MongoClient("mongodb://nsql-mongodb-1/", username="admin", password="admin")
+# Získání hodnot z prostředí
+MONGO_HOST = os.getenv("MONGO_HOST", "nsql-mongodb-1")
+MONGO_USER = os.getenv("MONGO_USER", "admin")
+MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "admin")
+
+# Připojení k MongoDB s použitím proměnných prostředí
+mongo = MongoClient(
+    f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_HOST}:27017/",
+    authSource="admin"
+)
 mymongodb = mongo["mymongodb"]
 users_collection = mymongodb["users"]
 tasks_collection = mymongodb["tasks"]

@@ -1,51 +1,38 @@
-{% extends "template.html" %}
-
-{% block subtitle %}
-Projects
-{% endblock %}
-
-{% block nav %}
-{% include "user_nav.html" %}
-{% endblock %}
-
-{% block main %}
+{% extends "template.html" %} {% block subtitle %} Projects {% endblock %} {%
+block nav %} {% include "user_nav.html" %} {% endblock %} {% block main %}
 <div class="container mt-3">
-    <h2>Profile</h2>
-    <div class="row">
-        <div class="col">
-            <h4>Project invitations</h4>
-            {% for invitation in invitations %}
-            <div class="card mt-1">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">User <strong>{{ invitation.sender_user }}</strong> invited you to project called <strong>{{ invitation.title }}</strong></div>
-                        <div class="col-3 text-end">
-                            <a role="button" class="btn btn-success btn-sm" href="{{ url_for('accept_invitation', _id=invitation._id) }}">Accept</a>
-                            <a role="button" class="btn btn-danger btn-sm" href="{{ url_for('decline_invitation', _id=invitation._id) }}">Decline</a>
-                        </div>
-                    </div>
-                </div>
+  <h2>Profile</h2>
+  <div class="row">
+    <div class="col">
+      <h4>Project invitations</h4>
+      {% for invitation in invitations %}
+      <div class="card mt-1">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              User <strong>{{ invitation.sender_user }}</strong> invited you to
+              project called <strong>{{ invitation.title }}</strong>
             </div>
-            {% endfor %}
-        </div>
-        <div class="col">
-            <h4>Friend requests</h4>
-            {% for request in requests %}
-            <div class="card mt-1">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">User <span class="fw-bold">{{ request.decode('utf-8') }}</span> has sent you friend request</div>
-                        <div class="col-3 text-end">
-                            <a role="button" class="btn btn-success btn-sm" href="{{ url_for('accept_friend_request', username=request.decode('utf-8')) }}">Accept</a>
-                            <a role="button" class="btn btn-danger btn-sm" href="{{ url_for('decline_friend_request', username=request.decode('utf-8')) }}">Decline</a>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-3 text-end">
+              <a
+                role="button"
+                class="btn btn-success btn-sm"
+                href="{{ url_for('accept_invitation', _id=invitation._id) }}"
+                >Accept</a
+              >
+              <a
+                role="button"
+                class="btn btn-danger btn-sm"
+                href="{{ url_for('decline_invitation', _id=invitation._id) }}"
+                >Decline</a
+              >
             </div>
-            {% endfor %}
+          </div>
         </div>
+      </div>
+      {% endfor %}
     </div>
-    
+  </div>
 </div>
 
 {% endblock %}
